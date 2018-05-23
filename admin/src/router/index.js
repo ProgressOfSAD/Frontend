@@ -25,8 +25,8 @@ export default new Router({
                     meta: { title: '基础表格' }
                 },
                 {
-                    path: '/tabs',
-                    component: resolve => require(['../components/page/Tabs.vue'], resolve),
+                    path: '/msg',
+                    component: resolve => require(['../components/page/Msg.vue'], resolve),
                     meta: { title: '信息中心' }
                 },
                 {
@@ -69,7 +69,19 @@ export default new Router({
                     path: '/permission',
                     component: resolve => require(['../components/page/Permission.vue'], resolve),
                     meta: { title: '权限测试', permission: true }
-                }
+                },
+                {
+                    // 权限页面
+                    path: '/additem',
+                    component: resolve => require(['../components/page/Additem.vue'], resolve),
+                    meta: { title: '增加书目' }
+                },
+                {
+                    // 权限页面
+                    path: '/edititem',
+                    component: resolve => require(['../components/page/Edititem.vue'], resolve),
+                    meta: { title: '修改书目信息' }
+                },
             ]
         },
         {

@@ -42,7 +42,7 @@
                     },
                     {
                         icon: 'el-icon-message',
-                        index: 'tabs',
+                        index: 'msg',
                         title: '信息中心'
                     },
                     {
@@ -87,7 +87,22 @@
                         icon: 'el-icon-error',
                         index: '404',
                         title: '404页面'
-                    }
+                    },
+                    {
+                        icon: 'el-icon-date',
+                        index: '4',
+                        title: '库存管理',
+                        subs: [
+                            {
+                                index: 'additem',
+                                title: '增加书目'
+                            },
+                            {
+                                index: 'edititem',
+                                title: '修改书目信息'
+                            }
+                        ]
+                    },
                 ]
             }
         },
