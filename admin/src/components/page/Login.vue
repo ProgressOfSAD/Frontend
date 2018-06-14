@@ -40,8 +40,22 @@
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
+                        // test
                         localStorage.setItem('ms_username',this.ruleForm.username);
                         this.$router.push('/');
+
+                        this.$axios.post('/manager_app/login', {
+                            'username': this.ruleForm.username,
+                            'password': this.ruleForm.password
+                        })
+                        .then((response)=>{
+                            if (response.status == 'success') {
+                                localStorage.setItem('ms_username',this.ruleForm.username);
+                                this.$router.push('/');
+                            } else {
+                                this.$message.error(response.error_msg);
+                            }
+                        });
                     } else {
                         console.log('error submit!!');
                         return false;
