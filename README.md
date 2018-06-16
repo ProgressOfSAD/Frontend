@@ -1,4 +1,4 @@
-# Frontend
+# Frontend[![Build Status](https://travis-ci.org/ProgressOfSAD/Frontend.svg?branch=master)](https://travis-ci.org/ProgressOfSAD/Frontend)
 user 为用户前端
 admin 为管理员前端
 # lsfr
