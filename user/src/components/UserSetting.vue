@@ -1,3 +1,28 @@
+<style scoped>
+.ivu-input-wrapper {
+    width: 200px;
+}
+.ivu-form >>> .ivu-form-item-label {
+    font-size: 15px;
+    margin: 10px 0px;
+}
+.ivu-menu {
+    height: 700px;
+}
+.ivu-form-item {
+    margin-top: 30px;
+}
+#user-content {
+    width: 60%;
+    height: 500px;
+    background: white;
+}
+#bt >>> .ivu-form-item-content {
+    margin-left:45% !important;
+    margin-top:20%;
+}
+</style>
+
 <template>
   <div id='user' :style="{padding: '10px 50px 0px 50px'}">
     <Row>
@@ -42,6 +67,9 @@
                         </Upload>
                     </Col>
                 </Row>
+                <FormItem id='bt'>
+                    <Button type="primary" @click="changeSettings('settings')">确认修改</Button>
+                </FormItem>
             </Form>
         </Col>
     </Row>
@@ -73,33 +101,11 @@ export default {
     },
     findBook: function() {
         this.$router.push('/detail')
+    },
+    changeSettings(settings) {
+        this.$Message.info('修改成功！')
+        this.$router.push('/user/setting')
     }
   }
 }
 </script>
-
-<style scoped>
-.ivu-input-wrapper {
-    width: 200px;
-}
-.ivu-form .ivu-form-item-label {
-    font-size: 15px;
-    margin: 10px 0px;
-}
-.ivu-menu {
-    height: 700px;
-}
-.ivu-form-item {
-    margin-top: 30px;
-}
-#user-content {
-    width: 60%;
-    height: 500px;
-    background: white;
-}
-#note {
-    font-size: 20px;
-    font-weight: bold;
-    padding: 50px 50px;
-}
-</style>

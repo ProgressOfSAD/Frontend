@@ -62,9 +62,9 @@
                             </Col>
                             <Col span="10">
                             <a @click="findBook()" class='bookname' style="height: 30px; fontSize: 20px; fontWeight: bold;">{{ b.bookname }}</a>
-                            <p class="score" style="height: 20px"><span style="fontWeight: bold">Score: </span>{{ b.score }}</p>
-                            <p class="author" style="height: 20px"><span style="fontWeight: bold">Author: </span>{{ b.author }}</p>
-                            <p class="date" style="height: 20px"><span style="fontWeight: bold">Publish: </span>{{ b.date }}</p>
+                            <p class="score" style="height: 20px"><span style="fontWeight: bold">评分: </span>{{ b.score }}</p>
+                            <p class="author" style="height: 20px"><span style="fontWeight: bold">作者: </span>{{ b.author }}</p>
+                            <p class="date" style="height: 20px"><span style="fontWeight: bold">出版日期: </span>{{ b.date }}</p>
                             <p class="des" style="height: 40px">{{ b.des }}</p>
                             </Col>
                         </Row>

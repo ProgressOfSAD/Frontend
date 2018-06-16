@@ -1,0 +1,6 @@
+sudo: required
+services:
+        - docker
+script:
+        - docker build -t frontend .
+        - docker run -e "ENV=UNIT" -p 8080:9528 frontend
