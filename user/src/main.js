@@ -3,25 +3,28 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+// import Router from 'vue-router'
 import iView from 'iview'
 import 'iview/dist/styles/iview.css'
-// import vuex from './store'
+import Vuex from './store'
 
 Vue.config.productionTip = false
 
 // Vue.use(VueRouter)
 Vue.use(iView)
+// Vue.use(Router)
 
 // const RouterConfig = {
-//   routes: Routers
+//   routes: routers,
+//   modes: 'history'
 // }
-// const router = new VueRouter(RouterConfig)
+// const router = new Router(RouterConfig)
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
-  // store: vuex,
+  store: Vuex,
   components: { App },
   template: '<App/>'
 })

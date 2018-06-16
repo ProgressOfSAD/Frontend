@@ -1,7 +1,7 @@
 <template>
   <div id='container'>
       <Tabs value='登录' id='tab'>
-          <TabPane class="tabs" label='登录'>
+          <TabPane class="tabs login" label='登录'>
               <Form ref='loginData' :model='loginData' :rules='ruleValidate'>
                 <FormItem prop='loginUsername'>
                   <Input placeholder="请输入用户名" v-model="loginData.loginUsername"></Input>
@@ -10,12 +10,14 @@
                   <Input type="password" placeholder="请输入密码" v-model="loginData.loginPw"></Input>
                 </FormItem>
                 <FormItem>
-                    <Button type="primary" @click="signin">Sign in</Button>
-                    <Button type="ghost" @click="cancel">Cancel</Button>
+                    <div class="in-buttons">
+                        <Button type="primary" @click="signup">Sign up</Button>
+                        <Button type="ghost" @click="cancel">Cancel</Button>
+                    </div>
                 </FormItem>
               </Form>
           </TabPane>
-          <TabPane label='注册' class="tabs">
+          <TabPane label='注册' class="tabs" id='signup'>
               <Form ref='signupData' :model='signupData' :rules='ruleValidate'>
                 <FormItem prop='signupUsername'>
                   <Input placeholder="请输入用户名" v-model="signupData.signupUsername"></Input>
@@ -27,8 +29,10 @@
                   <Input type="password" placeholder='确认密码' v-model="signupData.checkPw"></Input>
                 </FormItem>
                 <FormItem>
-                    <Button type="primary" @click="signup">Sign up</Button>
-                    <Button type="ghost" @click="cancel">Cancel</Button>
+                    <div class="up-buttons">
+                        <Button type="primary" @click="signup">Sign up</Button>
+                        <Button type="ghost" @click="cancel">Cancel</Button>
+                    </div>
                 </FormItem>
               </Form>
           </TabPane>
@@ -38,22 +42,30 @@
 
 <style>
 #container {
-  top: 100px;
   background-color: #eeeeee;
   position: relative;
   margin: auto;
-  width: 25%;
-  height: 20%;
+  width: 500px;
+  height: 300px;
+}
+#signup .ivu-form-item {
+    margin-bottom: 9px;
+}
+#tab .nav-text {
+  margin-left: 23%;
+  font-size: 25px;
 }
 #tab {
   width: 70%;
   position: relative;
   margin: auto;
 }
-#butt {
-  width: 27%;
-  position: relative;
-  margin: auto;
+.in-buttons {
+  margin-left: 30%;
+  margin-top: 30px;
+}
+.up-buttons {
+    margin-left: 30%;
 }
 #signinButt {
   position: relative;
