@@ -13,15 +13,6 @@
                         <i class="el-icon-rank"></i>
                     </el-tooltip>
                 </div>
-                <!-- 消息中心 -->
-                <div class="btn-bell">
-                    <el-tooltip effect="dark" :content="message?`有${message}条未读消息`:`消息中心`" placement="bottom">
-                        <router-link to="/msg">
-                            <i class="el-icon-bell"></i>
-                        </router-link>
-                    </el-tooltip>
-                    <span class="btn-bell-badge" v-if="message"></span>
-                </div>
                 <!-- 用户头像 -->
                 <div class="user-avator"><img src="static/img/img.jpg"></div>
                 <!-- 用户名下拉菜单 -->
@@ -57,9 +48,22 @@
         methods:{
             // 用户名下拉菜单选择事件
             handleCommand(command) {
-                if(command == 'loginout'){
-                    localStorage.removeItem('ms_username')
+                if(command == 'logout'){
+                    // test
+                    localStorage.removeItem('ms_username');
                     this.$router.push('/login');
+
+                    this.$axios.post('/manager_app/logout', {
+
+                    })
+                    .then((response)=>{
+                        if (response.status == 'success') {
+                            localStorage.removeItem('ms_username')
+                            this.$router.push('/login');
+                        } else {
+                            this.$message.error(response.error_msg);
+                        }
+                    })
                 }
             },
             // 侧边栏折叠

@@ -1,4 +1,5 @@
 <template>
+    
     <div>
         <div class="container">
             <div class="form-box">
@@ -30,11 +31,11 @@
                         <el-input v-model="form.publish_time"></el-input>
                     </el-form-item>
                     <el-form-item label="目录">
-                        <el-input type="textarea" rows="3" v-model="form.brief"></el-input>
+                        <el-input type="textarea" rows="3" v-model="form.contents"></el-input>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="onSubmit">表单提交</el-button>
-                        <el-button>取消</el-button>
+                        <el-button type="primary" @click="onSubmit">提交</el-button>
+                        <el-button @click="onClear">清空</el-button>
                     </el-form-item>
                 </el-form>
             </div>
@@ -78,12 +79,46 @@
                     press: '',
                     contents: '',
                     types: []
-                }
+                },
             }
         },
         methods: {
             onSubmit() {
-                this.$message.success('提交成功！');
+                var msgItem = {
+                    'cover': '',
+                    'name': this.form.name,
+                    'author': this.form.author,
+                    'brief': this.form.brief,
+                    'ISBN': this.form.ISBN,
+                    'publish_time': this.form.publish_time,
+                    'press': this.form.press,
+                    'contents': this.form.contents,
+                    'inventory': '',
+                    'types': this.form.types
+                };
+                msgItem = JSON.stringify(msgItem);
+                this.$axios.post('/manager_app/inventory_management', {
+                    'protocol': '0',
+                    'msg': msgItem
+                })
+                .then((response)=>{
+                    if (response.status == 'success') {
+                        this.$message.success('提交成功！');
+                    } else {
+                        this.$message.error(response.error_msg);
+                    }
+                })
+                
+            },
+            onClear() {
+                this.form.name = '';
+                this.form.author = '';
+                this.form.brief = '';
+                this.form.ISBN = '';
+                this.form.publish_time = '';
+                this.form.press = '';
+                this.form.contents = '';
+                this.form.types = [];
             }
         }
     }
