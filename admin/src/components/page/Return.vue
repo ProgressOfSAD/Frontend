@@ -5,7 +5,7 @@
             <el-input v-model="select_word" placeholder="搜索用户名" class="handle-input mr10"></el-input>
             <el-button type="primary" icon="search" @click="getSearchReturn">搜索</el-button>
         </div>
-        <el-table :data="tableData" style="width: 100%">
+        <el-table v-if="ready" :data="tableData" style="width: 100%">
             <el-table-column type="expand">
                 <template slot-scope="props">
                     <el-form label-position="left" inline class="demo-table-expand">
@@ -52,6 +52,7 @@
 export default {
     data() {
         return {
+            ready: false,
             select_word: '',
             editVisible: false,
             tableLen: 1,
@@ -61,13 +62,14 @@ export default {
                 bookname: '',
                 ISBN: '',
             },
-            tableData: [{
+            tableData: [],
+            /*tableData: [{
                 name: 'zhangsan',
                 bookname: '五年高考三年模拟',
             }, {
                 name: 'lisi',
                 bookname: '法大师傅大师傅收到',
-            }]
+            }]*/
         }
     },
     methods: {
@@ -76,6 +78,7 @@ export default {
             this.idx = index;
             const item = this.tableData[index];
             this.form = {
+                id: item.id,
                 name: item.name,
                 bookname: item.bookname,
             }
@@ -86,44 +89,48 @@ export default {
             this.editVisible = false;
             const item = this.tableData.splice(this.idx, 1);
 
-            this.$axios.post('/manager_app/return', {
+            this.$axios.post('/manager_app/return/', this.$qs.stringify({
                 rid: this.form.id
-            })
+            }))
             .then((response)=>{
-                if (response.status == 'success') {
+                if (response.data.status == 'success') {
                     this.$message.success(`归还成功`);
                 } else {
-                    this.$message.success(response.error_msg);
+                    this.$message.error(response.data.error_msg);
                 }
             }); 
         },
         getSearchReturn() {
-            this.$axios.get('/manager_app/return', {
+            this.ready = false;
+            this.$axios.get('/manager_app/return/', {
                 params: {
-                    username: this.form.name
+                    username: this.select_word
                 }
             })
             .then((response)=> {
-                if (response.status == 'success') {
-                    const msgItem = JSON.parse(response.msg);
+                if (response.data.status == 'success') {
+                    const msgItem = JSON.parse(response.data.msg);
+                    console.log(msgItem);
                     var i = 0;
                     for (var key in msgItem) {
-                        tableData[i].id = key;
-                        tableData[i].name = msgItem[key].username;
-                        tableData[i].bookname = msgItem[key].book;
+                        const msgInner = JSON.parse(msgItem[key]);
+                        this.tableData[i] = {
+                            id: key,
+                            name: msgInner.username,
+                            bookname: msgInner.book,
+                            active_time: msgInner.active_time,
+                        }
                         i = i+1;
                     }
+                    this.ready = true;
                 } else {
-                    this.$message.error(response.error_msg);
+                    this.$message.error(response.data.error_msg);
                 }
             });
         }
     },
+    activated() {
 
-    computed: {
-        isTableShow(){
-            return this.tableLen > 0;
-        }
     }
 }
 

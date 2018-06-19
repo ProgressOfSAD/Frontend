@@ -41,19 +41,21 @@
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         // test
-                        localStorage.setItem('ms_username',this.ruleForm.username);
-                        this.$router.push('/');
-
-                        this.$axios.post('/manager_app/login', {
+                        // localStorage.setItem('ms_username',this.ruleForm.username);
+                        // this.$router.push('/');
+                        console.log(typeof(this.ruleForm.username));
+                        console.log(typeof(this.ruleForm.password));
+                        this.$axios.post('/manager_app/login/', this.$qs.stringify({
                             'username': this.ruleForm.username,
                             'password': this.ruleForm.password
-                        })
+                        }))
                         .then((response)=>{
-                            if (response.status == 'success') {
+                            if (response.data.status == 'success') {
                                 localStorage.setItem('ms_username',this.ruleForm.username);
                                 this.$router.push('/');
                             } else {
-                                this.$message.error(response.error_msg);
+                                console.log(response); 
+                                this.$message.error(response.data.error_msg);
                             }
                         });
                     } else {

@@ -60,11 +60,12 @@
     export default {
         data() {
             return {
-                istest: true,
+                istest: false,
                 editVisible: false,
                 message: 'first',
                 showHeader: false,
-                unread: [{
+                unread: [],
+                /*unread: [{
                     id: '',
                     content: '草泥马你个傻掉有种拿刀来砍老子',
                     report_reasons: {
@@ -92,7 +93,7 @@
                         r7: '4324',
                         r8: '2664',
                     }
-                }],
+                }],*/
                 form: {
                     id: '',
                     content: '',
@@ -124,15 +125,15 @@
                 const item = this.unread.splice(index, 1);
                 console.log(item);
 
-                this.$axios.post('/manager_app/report_info_box', {
+                this.$axios.post('/manager_app/report_info_box/', this.$qs.stringify({
                     'protocol': '1',
                     'cid': item.id
-                })
+                }))
                 .then((response)=>{
-                    if (response.status == 'success') {
+                    if (response.data.status == 'success') {
                         this.$message.success(`成功忽略`);
                     } else {
-                        this.$message.error(response.error_msg);
+                        this.$message.error(response.data.error_msg);
                     }
                 });
             },
@@ -140,23 +141,23 @@
                 const item = this.unread.splice(index, 1);
                 console.log(item);
 
-                this.$axios.post('/manager_app/report_info_box', {
+                this.$axios.post('/manager_app/report_info_box/', {
                     'protocol': '0',
                     'cid': item.id
                 })
                 .then((response)=>{
-                    if (response.status == 'success') {
+                    if (response.data.status == 'success') {
                         this.$message.success(`成功删除被举报评论`);
                     } else {
-                        this.$message.error(response.error_msg);
+                        this.$message.error(response.data.error_msg);
                     }
                 });
             },
             getReportInfo() {
-                this.$axios.get('/manager_app/report_info_box')
+                this.$axios.get('/manager_app/report_info_box/')
                 .then((response)=>{
-                    if (response.status == 'success') {
-                        const reportItem = JSON.parse(response.msg);
+                    if (response.data.status == 'success') {
+                        const reportItem = JSON.parse(response.data.msg);
                         const reportLen = reportItem.length;
                         var i = 0;
                         for (var key in reportItem) {
@@ -174,7 +175,7 @@
                             i = i+1;
                         }
                     } else {
-                        this.$message.console.error(response.error_msg);
+                        this.$message.console.error(response.data.error_msg);
                     }
                 });
             }

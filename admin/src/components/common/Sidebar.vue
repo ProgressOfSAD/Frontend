@@ -52,6 +52,14 @@
                             {
                                 index: 'edititem',
                                 title: '修改书目信息'
+                            },
+                            {
+                                index: 'addtype',
+                                title: '增加类型'
+                            },
+                            {
+                                index: 'edittype',
+                                title: '修改类型'
                             }
                         ]
                     },
@@ -74,7 +82,7 @@
                         icon: 'el-icon-time',
                         index: 'return',
                         title: '书籍归还'
-                    },
+                    }
 
                 ]
             }
