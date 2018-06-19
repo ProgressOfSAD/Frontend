@@ -21,7 +21,7 @@
                         {{username}} <i class="el-icon-caret-bottom"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item command="loginout">退出登录</el-dropdown-item>
+                        <el-dropdown-item command="logout">退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
             </div>
@@ -53,15 +53,14 @@
                     localStorage.removeItem('ms_username');
                     this.$router.push('/login');
 
-                    this.$axios.post('/manager_app/logout', {
-
+                    this.$axios.post('/manager_app/logout/', {
                     })
                     .then((response)=>{
-                        if (response.status == 'success') {
+                        if (response.data.status == 'success') {
                             localStorage.removeItem('ms_username')
                             this.$router.push('/login');
                         } else {
-                            this.$message.error(response.error_msg);
+                            this.$message.error(response.data.error_msg);
                         }
                     })
                 }

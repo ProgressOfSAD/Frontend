@@ -15,6 +15,9 @@
                         <el-form-item label="作者">
                             <span>{{ props.row.author }}</span>
                         </el-form-item>
+                        <el-form-item label="库存">
+                            <span>{{ props.row.inventory }}</span>
+                        </el-form-item>
                         <el-form-item label="ISBN">
                             <span>{{ props.row.ISBN }}</span>
                         </el-form-item>
@@ -60,12 +63,14 @@
             <el-form-item label="作者">
                 <el-input v-model="form.author"></el-input>
             </el-form-item>
+            <el-form-item label="库存">
+                <el-input-number v-model="form.inventory" :min="0" label="库存"></el-input-number>
+            </el-form-item>
             <el-form-item label="类型">
-                <el-select v-model="form.types" multiple placeholder="请选择">
+                <el-select v-if="ready" v-model="form.types" multiple placeholder="请选择">
                     <el-option v-for="option in options" 
-                        :key="option.value" 
-                        :label="option.label" 
-                        :value="option.value"></el-option>
+                            :key="option.value"
+                            :value="option.value" ></el-option>
                 </el-select>
             </el-form-item>
             <el-form-item label="简介">
@@ -98,31 +103,11 @@
 export default {
     data() {
         return {
-            options: [
-                {
-                    value: '0',
-                    label: '文学'
-                },
-                {
-                    value: '1',
-                    label: '教育'
-                },
-                {
-                    value: '2',
-                    label: '金融'
-                },
-                {
-                    value: '3',
-                    label: '计算机'
-                },
-                {
-                    value: '4',
-                    label: '经管'
-                }
-            ],
+            ready: false,
+            isTableShow: false,
+            options: [],
             select_word: '',
             editVisible: false,
-            tableLen: 1,
             form: {
                 name: '',
                 author: '',
@@ -133,7 +118,8 @@ export default {
                 contents: '',
                 types: []
             },
-            tableData: [{
+            tableData: [],
+            /*tableData: [{
                 id: '',
                 name: '五年高考三年模拟',
                 author: '曲一线',
@@ -173,7 +159,7 @@ export default {
                 press: '纷纷威风威风威风威风',
                 contents: '非法违法我v和港台日韩天热过热',
                 types: []
-            }]
+            }]*/
         }
     },
     methods: {
@@ -189,14 +175,19 @@ export default {
                 publish_time: item.publish_time,
                 press: item.press,
                 contents: item.contents,
+                inventory: item.inventory,
                 types: item.types
             }
             this.editVisible = true;
         },
         saveEdit() {
-            this.$set(this.tableData, this.idx, this.form);
-            this.editVisible = false;
-
+            var typeItem = {
+            };
+            var i = 1;
+            for (var key in this.form.types) {
+                typeItem["" + i] = this.form.types[key];
+                i = i + 1;
+            }
             var msgItem = {
                     'cover': '',
                     'name': this.form.name,
@@ -206,57 +197,94 @@ export default {
                     'publish_time': this.form.publish_time,
                     'press': this.form.press,
                     'contents': this.form.contents,
-                    'inventory': '',
-                    'types': this.form.types
+                    'inventory': this.form.inventory,
+                    'types': JSON.stringify(typeItem)
             };
             msgItem = JSON.stringify(msgItem);
-            this.$axios.post('/manager_app/inventory_management', {
+            this.$axios.post('/manager_app/inventory_management/', this.$qs.stringify({
                     'protocol': '1',
                     'msg': msgItem
-            })
+            }))
             .then((response)=>{
-                if (response.status == 'success') {
+                if (response.data.status == 'success') {
                     this.$message.success('修改成功！');
+                    this.$set(this.tableData, this.idx, this.form);
+                    this.editVisible = false;
                 } else {
-                    this.$message.error(response.error_msg);
+                    this.$message.error(response.data.error_msg);
                 }
             })
         },
         getSearchItem() {
-            this.$axios.get('/manager_app/inventory_management', {
+            this.isTableShow = false;
+            this.tableData = [];
+            this.$axios.get('/manager_app/inventory_management/', {
                 params: {
                     key: this.select_word
                 }
             })
             .then((response)=>{
-                if (response.status == 'success') {
-                    const msgItem = JSON.parse(response.msg);
+                if (response.data.status == 'success') {
+                    const msgItem = JSON.parse(response.data.msg);
+                    console.log(msgItem);
                     var i = 0;
                     for (var key in msgItem) {
-                        tableData[i].id = key;
-                        tableData[i].cover = msgItem[key].cover;
-                        tableData[i].name = msgItem[key].name;
-                        tableData[i].author = msgItem.author;
-                        tableData[i].brief = msgItem.brief;
-                        tableData[i].ISBN = msgItem.ISBN;
-                        tableData[i].publish_time = msgItem.publish_time;
-                        tableData[i].press = msgItem.press;
-                        tableData[i].contents = msgItem.contents;
-                        tableData[i].types = msgItem.types;
+                        var msgItemkey = JSON.parse(msgItem[key]);
+                        var typeItem = JSON.parse(msgItemkey.types);
+                        var j = 0;
+                        var msgTypes = [];
+                        for (var typekey in typeItem) {
+                            msgTypes[j] = typeItem[typekey];
+                            j = j+1;
+                        }
+                        this.tableData[i] = {
+                            id: key,
+                            cover: msgItemkey.cover,
+                            name: msgItemkey.name,
+                            author: msgItemkey.author,
+                            brief: msgItemkey.brief,
+                            ISBN: msgItemkey.ISBN,
+                            publish_time: msgItemkey.publish_time,
+                            press: msgItemkey.press,
+                            contents: msgItemkey.contents,
+                            inventory: msgItemkey.inventory,
+                            types: msgTypes,
+                        }
+                        console.log(this.tableData);
                         i = i+1;
                     }
+                    if (i > 0) {
+                        this.isTableShow = true;
+                    }
                 } else {
-                    this.$message.error(response.error_msg);
+                    this.$message.error(response.data.error_msg);
                 }
             })
-        }
+        },
+        getTypes() {
+                this.ready = false;
+                this.$axios.get('/manager_app/type_management/')
+                .then((response)=>{
+                    if (response.data.status == 'success') {
+                        var msgItem = JSON.parse(response.data.msg);
+                        var i = 0;
+                        for (var key in msgItem) {
+                            this.options[i] = {
+                                value: msgItem[key]
+                            };
+                            i = i+1;
+                        }
+                        console.log(this.options);
+                        this.ready = true;
+                    } else {
+                        this.$message.error(response.data.error_msg);
+                    }
+                })
+            }
     },
-
-    computed: {
-        isTableShow(){
-            return this.tableLen > 0;
-        }
-    }
+    activated() {
+        this.getTypes();
+    },
 }
 
 </script>

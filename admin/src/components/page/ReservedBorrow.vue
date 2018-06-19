@@ -61,13 +61,14 @@ export default {
                 bookname: '',
                 ISBN: '',
             },
-            tableData: [{
+            tableData: [],
+            /*tableData: [{
                 name: 'zhangsan',
                 bookname: '五年高考三年模拟',
             }, {
                 name: 'lisi',
                 bookname: '法大师傅大师傅收到',
-            }]
+            }]*/
         }
     },
     methods: {
@@ -91,26 +92,26 @@ export default {
                 bid: this.form.id
             }
             msgItem = JSON.stringify(msgItem);
-            this.$axios.post('/manager_app/debit', {
+            this.$axios.post('/manager_app/debit/', this.$qs.stringify({
                 msg: msgItem
-            })
+            }))
             .then((response)=>{
-                if (response.status == 'success') {
+                if (response.data.status == 'success') {
                     this.$message.success('借阅成功！');
                 } else {
-                    this.$message.error(response.error_msg);
+                    this.$message.error(response.data.error_msg);
                 }
             });
         },
         getSearchRever() {
-            this.$axios.get('/manager_app/debit', {
+            this.$axios.get('/manager_app/debit/', {
                 params: {
                     username: select_word
                 }
             })
             .then((response)=> {
-                if (response.status == 'success') {
-                    const msgItem = JSON.parse(response.msg);
+                if (response.data.status == 'success') {
+                    const msgItem = JSON.parse(response.data.msg);
                     var i = 0;
                     for (var key in msgItem) {
                         tableData[i].id = key;
@@ -119,7 +120,7 @@ export default {
                         i = i+1;
                     }
                 } else {
-                    this.$message.error(response.error_msg);
+                    this.$message.error(response.data.error_msg);
                 }
             })
         }

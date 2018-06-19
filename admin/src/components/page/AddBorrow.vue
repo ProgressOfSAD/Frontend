@@ -33,41 +33,43 @@
         methods: {
             onSubmit() {
                 var getBid;
-
-                this.$axios.get('/manager_app/inventory_management', {
+                this.$axios.get('/manager_app/inventory_management/', {
                     params: {
                         key: this.form.ISBN
                     }
                 })
                 .then((response)=>{
-                    if (response.status == 'success') {
-                        const msgItem = JSON.parse(response.msg);
+                    if (response.data.status == 'success') {
+                        const msgItem = JSON.parse(response.data.msg);
+                        var hasBook = false;
                         for (var key in msgItem) {
-                            if (msgItem[key].ISBN == this.form.ISBN) {
+                            const msgInner = JSON.parse(msgItem[key]);
+                            if (msgInner.ISBN == this.form.ISBN) {
                                 getBid = key;
+                                hasBook = true;
+                                var newmsgItem = {
+                                    username: this.form.borrowname,
+                                    bid: getBid
+                                }
+                                newmsgItem = JSON.stringify(newmsgItem);
+                                this.$axios.post('/manager_app/debit/', this.$qs.stringify({
+                                    msg: newmsgItem
+                                }))
+                                .then((response)=>{
+                                    if (response.data.status == 'success') {
+                                        this.$message.success('借阅成功！');
+                                    } else {
+                                        this.$message.error(response.data.error_msg);
+                                    }
+                                });
                                 break;
                             }
                         }
+                        if (!hasBook) this.$message.error('no such book');
                     } else {
-                        this.$message.error(response.error_msg);
+                        this.$message.error(response.data.error_msg);
                     }
                 })
-
-                var msgItem = {
-                    username: this.form.borrowname,
-                    bid: getBid
-                }
-                msgItem = JSON.stringify(msgItem);
-                this.$axios.post('/manager_app/debit', {
-                    msg: msgItem
-                })
-                .then((response)=>{
-                    if (response.status == 'success') {
-                        this.$message.success('借阅成功！');
-                    } else {
-                        this.$message.error(response.error_msg);
-                    }
-                });
             },
             onClear() {
                 this.form.borrowname = '';

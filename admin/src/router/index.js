@@ -59,6 +59,18 @@ export default new Router({
                     component: resolve => require(['../components/page/Return.vue'], resolve),
                     meta: { title: '书籍归还' }
                 },
+                {
+                    // 权限页面
+                    path: '/addtype',
+                    component: resolve => require(['../components/page/AddType.vue'], resolve),
+                    meta: { title: '增加类型' }
+                },
+                {
+                    // 权限页面
+                    path: '/edittype',
+                    component: resolve => require(['../components/page/EditType.vue'], resolve),
+                    meta: { title: '修改类型' }
+                },
             ]
         },
         {

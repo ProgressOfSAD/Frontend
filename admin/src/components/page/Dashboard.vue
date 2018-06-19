@@ -29,7 +29,7 @@
     export default {
         data() {
             return {
-                istest: true,
+                istest: false,
                 name: localStorage.getItem('ms_username'),
                 gender: '男',
                 email: 'admin@sad.com',
@@ -42,24 +42,24 @@
                 return '管理员';
             }
         },
-        mounted() {
+        activated() {
             if (!this.istest) {
                 this.getUserInfo();
             }
         },
         methods: {
             getUserInfo() {
-                this.$axios.get('/manager_app/manager_info')
+                this.$axios.get('/manager_app/manager_info/')
                 .then((response)=>{
-                    if (response.status == 'success') {
-                        const infoItem = JSON.parse(response.msg);
-                        this.name = infoItem.name;
+                    if (response.data.status == 'success') {
+                        const infoItem = JSON.parse(response.data.msg);
+                        this.name = infoItem.username;
                         this.gender = infoItem.gender;
                         this.email = infoItem.email;
                         this.phonenum = infoItem.phone;
                         this.other = infoItem.other;
                     } else {
-                        this.$message.error(response.error_msg);
+                        this.$message.error(response.data.error_msg);
                         
                     }
                 });

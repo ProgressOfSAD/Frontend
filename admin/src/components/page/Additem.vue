@@ -10,12 +10,14 @@
                     <el-form-item label="作者">
                         <el-input v-model="form.author"></el-input>
                     </el-form-item>
+                    <el-form-item label="库存">
+                        <el-input-number v-model="form.inventory" :min="0" label="库存"></el-input-number>
+                    </el-form-item>
                     <el-form-item label="类型">
-                        <el-select v-model="form.types" multiple placeholder="请选择">
+                        <el-select v-if="ready" v-model="form.types" multiple placeholder="请选择">
                             <el-option v-for="option in options" 
-                                       :key="option.value" 
-                                       :label="option.label" 
-                                       :value="option.value"></el-option>
+                                       :key="option.value"
+                                       :value="option.value" ></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="简介">
@@ -48,28 +50,19 @@
     export default {
         data: function(){
             return {
-                options: [
+                ready: false,
+                options: [],
+                /*options: [
                     {
-                        value: '0',
-                        label: '文学'
+                        value: 'lit',
                     },
                     {
-                        value: '1',
-                        label: '教育'
+                        value: 'edu',
                     },
                     {
-                        value: '2',
-                        label: '金融'
-                    },
-                    {
-                        value: '3',
-                        label: '计算机'
-                    },
-                    {
-                        value: '4',
-                        label: '经管'
+                        value: 'fin',
                     }
-                ],
+                ],*/
                 form: {
                     name: '',
                     author: '',
@@ -78,12 +71,40 @@
                     publish_time: '',
                     press: '',
                     contents: '',
+                    inventory: 0,
                     types: []
                 },
             }
         },
         methods: {
+            getTypes() {
+                this.ready = false;
+                this.$axios.get('/manager_app/type_management/')
+                .then((response)=>{
+                    if (response.data.status == 'success') {
+                        var msgItem = JSON.parse(response.data.msg);
+                        var i = 0;
+                        for (var key in msgItem) {
+                            this.options[i] = {
+                                value: msgItem[key]
+                            };
+                            i = i+1;
+                        }
+                        console.log(this.options);
+                        this.ready = true;
+                    } else {
+                        this.$message.error(response.data.error_msg);
+                    }
+                })
+            },
             onSubmit() {
+                var typeItem = {
+                };
+                var i = 1;
+                for (var key in this.form.types) {
+                    typeItem["" + i] = this.form.types[key];
+                    i = i + 1;
+                }
                 var msgItem = {
                     'cover': '',
                     'name': this.form.name,
@@ -93,19 +114,19 @@
                     'publish_time': this.form.publish_time,
                     'press': this.form.press,
                     'contents': this.form.contents,
-                    'inventory': '',
-                    'types': this.form.types
+                    'inventory': this.form.inventory,
+                    'types': JSON.stringify(typeItem)
                 };
                 msgItem = JSON.stringify(msgItem);
-                this.$axios.post('/manager_app/inventory_management', {
+                this.$axios.post('/manager_app/inventory_management/', this.$qs.stringify({
                     'protocol': '0',
                     'msg': msgItem
-                })
+                }))
                 .then((response)=>{
-                    if (response.status == 'success') {
+                    if (response.data.status == 'success') {
                         this.$message.success('提交成功！');
                     } else {
-                        this.$message.error(response.error_msg);
+                        this.$message.error(response.data.error_msg);
                     }
                 })
                 
@@ -120,6 +141,9 @@
                 this.form.contents = '';
                 this.form.types = [];
             }
-        }
+        },
+        activated() {
+            this.getTypes();
+        },
     }
 </script>
