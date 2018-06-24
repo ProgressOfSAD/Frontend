@@ -69,6 +69,7 @@
                 </Row>
                 <FormItem id='bt'>
                     <Button type="primary" @click="changeSettings('settings')">确认修改</Button>
+                    <Button  @click="logout()">退出账号</Button>
                 </FormItem>
             </Form>
         </Col>
@@ -78,6 +79,8 @@
 
 <script>
 /* eslint-disable */
+import axios from 'axios'
+import qs from 'qs'
 export default {
   data: function() {
       return {
@@ -92,6 +95,17 @@ export default {
           }
       }
   },
+  computed: {
+    id() {
+      return this.$store.state.id
+    },
+    avatar() {
+      return this.$store.state.avatar
+    },
+    isLogin() {
+      return this.$store.state.isLogin
+    }
+  },
   methods: {
     selectFn (a) {
         console.log(a, this.$route.path)
@@ -105,6 +119,27 @@ export default {
     changeSettings(settings) {
         this.$Message.info('修改成功！')
         this.$router.push('/user/setting')
+    },
+    logout() {
+        var that = this
+        axios({
+            method: 'post', 
+            url: 'api/user_app/logout/'
+        })
+            .then (function(res) {
+                if (res.data.status === 'success') {
+                    that.$Message.info('登出成功')
+                    that.$store.commit('setId', -1)
+                    that.$store.commit('setAvatar', '')
+                    that.$store.commit('changeLogin')
+                    that.$router.push('/')
+                } else {
+                    that.$Message.error(res.data.error_msg)
+                }
+            })
+            .catch(function(err) {
+                that.$Message.error('登出失败，请稍后重试')
+            })
     }
   }
 }

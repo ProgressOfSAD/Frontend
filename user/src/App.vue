@@ -1,20 +1,22 @@
 <template>
     <Layout>
         <Header>
-            <Menu mode="horizontal" :theme='primary'>
+            <Menu mode="horizontal">
                 <a class="layout-logo" @click="jump('main')">
-                    <img id='logo' src="./assets/SunYet-sen.png">
-                    <span id='logo-name'>中山大学图书馆</span>
+                    <img id='logo' src="../static/img/SunYet-sen.png">
+                    <span id='logo-name'>云书架</span>
                 </a>
                 <div class="layout-nav">
-                    <Form ref="formInline" :model="formInline" :rules="ruleInline" inline>
+                    <Form inline>
                         <FormItem prop='searchKey' id='search'>
-                            <Input v-model="searchKey" placeholder="输入书名、作者、ISBN..." style="width: 200px">
-                            </Input>
-                            <Button type="primary" @click="handleSubmit('formInline')">search</Button>
+                            <Input v-model="searchKey" placeholder="输入书名、作者、ISBN..." style="width: 200px"></Input>
+                            <Button type="primary" @click="search('searchKey')">搜索</Button>
                         </FormItem>
-                        <a @click="jump('login')">
-                            <Avatar style="background-color: green" icon="person" />
+                        <a @click="jump('user')" v-if="isLogin">
+                            <Avatar :src="avatar" />
+                        </a>
+                        <a @click="jump('login')" v-else>
+                          <Avatar icon="person" />
                         </a>
                     </Form>
                 </div>
@@ -30,7 +32,29 @@
 <script>
 export default {
   name: "App",
+  data: function() {
+    return {
+      searchKey: ''
+    }
+  },
+  computed: {
+    id() {
+      return this.$store.state.id
+    },
+    avatar() {
+      return this.$store.state.avatar
+    },
+    isLogin() {
+      return this.$store.state.isLogin
+    }
+  },
   methods: {
+    findUser() {
+      this.$router.push('/user/bookshelf')
+    },
+    search(searchKey) {
+
+    },
     jump: function(name) {
       switch (name) {
         case "main":
@@ -46,7 +70,7 @@ export default {
           name = "/search";
           break;
         case "user":
-          name = "/user";
+          name = "/user/bookshelf";
           if (this.$store.state.userId === "") {
             this.isLogin = true;
             return;
@@ -73,9 +97,9 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
-.ivu-layout {
+/* .ivu-layout {
     height: 800px;
-}
+} */
 .layout {
   border: 1px solid #eeeeee;
   /* background: #eeeeee */
