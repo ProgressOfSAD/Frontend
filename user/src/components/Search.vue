@@ -1,7 +1,7 @@
 <template>
-    <div id="search">
+    <div id="search" style="padding: 10px 50px 0 50px">
         <div class="keyword">
-            搜索{{ keyword }}
+            搜索"{{ keyword }}",
             共{{ num }}条记录
         </div>
         <div class="details">
@@ -29,14 +29,18 @@
 </template>
 
 <style scoped>
-/* #search {
-    width: 42%;
-    margin: auto;
-} */
+.keyword {
+    font-size: 15px;
+    padding-bottom: 10px;
+    color: #6791F0;
+}
 </style>
 
 <script>
 /* eslint-disable */
+import axios from 'axios'
+import qs from 'qs'
+
 export default {
     data: function() {
         return {
@@ -76,7 +80,52 @@ export default {
             }
           ]
         }
-    }
+    },
+    methods: {
+        updateData() {
+            console.log('update')
+
+        }
+    },
+    watch: {
+        '$route' : 'updateData'
+    },
+    beforeRouteEnter(to, from, next) {
+        console.log('enter')
+        next(vm => {
+            console.log(vm.$route.params.keyword)
+            vm.keyword = vm.$route.params.keyword
+            axios.get('/api/user_app/retrieve/key=' + vm.keyword)
+            .then(function(res) {
+                if (res.data.status === 'success') {
+                    
+                } else {
+                    vm.$Message.error(res.data.error_msg)
+                }
+            })
+            .catch(function(err) {
+                vm.$Message.error('请稍后重试')
+            })
+        })
+    },
+    // beforeRouteUpdate(to, from, next) {
+    //     console.log('update')
+    //     next(vm => {
+    //         console.log(vm.$route.params.keyword)
+    //         vm.keyword = vm.$route.params.keyword
+    //         axios.get('api/user_app/retrieve/?key=' + vm.keyword)
+    //         .then(function(res) {
+    //             if (res.data.status === 'success') {
+                    
+    //             } else {
+    //                 vm.$Message.error(res.data.error_msg)
+    //             }
+    //         })
+    //         .catch(function(err) {
+    //             vm.$Message.error('请稍后重试')
+    //         })
+    //     })
+    // }
 }
 </script>
 

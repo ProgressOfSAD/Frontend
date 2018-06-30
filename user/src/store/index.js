@@ -20,8 +20,8 @@ export default new Vuex.Store({
     setAvatar (state, a) {
       state.avatar = a
     },
-    changeLogin (state) {
-      state.isLogin = !state.isLogin
+    setLogin (state, b) {
+      state.isLogin = b
     },
     reset (state) {
       state.userId = ''

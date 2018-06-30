@@ -10,7 +10,7 @@
                     <Form inline>
                         <FormItem prop='searchKey' id='search'>
                             <Input v-model="searchKey" placeholder="输入书名、作者、ISBN..." style="width: 200px"></Input>
-                            <Button type="primary" @click="search('searchKey')">搜索</Button>
+                            <Button type="primary" @click="search()">搜索</Button>
                         </FormItem>
                         <a @click="jump('user')" v-if="isLogin">
                             <Avatar :src="avatar" />
@@ -22,9 +22,14 @@
                 </div>
             </Menu>
         </Header>
+        <div id="content" style="height: 800px">
         <router-view></router-view>
-        <Footer class="layout-footer-center">Contact us:
-            <a href='https://github.com/ProgressOfSAD'>Github</a>
+        </div>
+        <Footer class="layout-footer-center">
+          管理员系统:
+          <a href="http://localhost:8080/#/login">登录</a><br/>
+          联系我们:
+          <a href='https://github.com/ProgressOfSAD'>Github</a>
         </Footer>
     </Layout>
 </template>
@@ -48,12 +53,27 @@ export default {
       return this.$store.state.isLogin
     }
   },
+  created () {
+    let id = window.localStorage.getItem('id')
+    let name = window.localStorage.getItem('name')
+    let avatar = window.localStorage.getItem('avatar')
+    let isLogin = window.localStorage.getItem('isLogin')
+    console.log(id, name, avatar, isLogin)
+    this.$store.commit('setName', name)
+    this.$store.commit('setId', id)
+    this.$store.commit('setAvatar', avatar)
+    this.$store.commit('setLogin', isLogin)
+  },
   methods: {
-    findUser() {
-      this.$router.push('/user/bookshelf')
-    },
-    search(searchKey) {
-
+    search() {
+      console.log('change' + this.searchKey)
+      this.$router.push({
+        path: '/search',
+        name: 'Search',
+        params: {
+          keyword: this.searchKey
+        }
+      })
     },
     jump: function(name) {
       switch (name) {
@@ -70,11 +90,7 @@ export default {
           name = "/search";
           break;
         case "user":
-          name = "/user/bookshelf";
-          if (this.$store.state.userId === "") {
-            this.isLogin = true;
-            return;
-          }
+          name = "/user";
           break;
         case "group":
           name = "/group";

@@ -169,17 +169,17 @@ export default {
               if (res.data.status === 'success') {
                 
                 that.$store.commit('setName', that.loginData.loginUsername)
-                localStorage.setItem('name', that.loginData.loginUsername)
+                window.localStorage.setItem('name', that.loginData.loginUsername)
                 // 对msg串处理
                 var str = JSON.parse(res.data.msg).uid
-                localStorage.setItem('id', str) //存储数据，value为string类型，如果要存对象，先转换
+                window.localStorage.setItem('id', str) //存储数据，value为string类型，如果要存对象，先转换
                 that.$store.commit('setId', str)
 
                 that.$store.commit('setAvatar', '../../static/img/avatar2.jpeg')
-                localStorage.setItem('avatar', '../../static/img/avatar2.jpeg')
+                window.localStorage.setItem('avatar', '../../static/img/avatar2.jpeg')
 
-                that.$store.commit('changeLogin')
-                localStorage.setItem('isLoin', that.$store.state.isLogin)
+                that.$store.commit('setLogin', true)
+                window.localStorage.setItem('isLogin', that.$store.state.isLogin)
                 console.log(that.$store.state)
                 that.$Message.success('登录成功')
                 that.$router.push('/')

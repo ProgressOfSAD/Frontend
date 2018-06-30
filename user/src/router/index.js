@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '../components/Login'
 import Index from '../components/Index'
+import User from '../components/User'
 import UserShelf from '../components/UserShelf'
 import UserMessage from '../components/UserMessage'
 import UserComment from '../components/UserComment'
@@ -36,36 +37,30 @@ var router = new Router({
       component: Login
     },
     {
-      path: '/user/bookshelf',
-      name: 'UserShelf',
+      path: '/user/',
+      // name: 'User',
       meta: {
         requireAuth: true // 添加该字段，说明进入该路由需要登录
       },
-      component: UserShelf
-    },
-    {
-      path: '/user/message',
-      name: 'UserMessage',
-      meta: {
-        requireAuth: true // 添加该字段，说明进入该路由需要登录
-      },
-      component: UserMessage
-    },
-    {
-      path: '/user/comment',
-      name: 'UserComment',
-      meta: {
-        requireAuth: true // 添加该字段，说明进入该路由需要登录
-      },
-      component: UserComment
-    },
-    {
-      path: '/user/setting',
-      name: 'UserSetting',
-      meta: {
-        requireAuth: true // 添加该字段，说明进入该路由需要登录
-      },
-      component: UserSetting
+      component: User,
+      children: [
+        {
+          path: '/',
+          component: UserShelf
+        },
+        {
+          path: 'message',
+          component: UserMessage
+        },
+        {
+          path: 'comment',
+          component: UserComment
+        },
+        {
+          path: 'setting',
+          component: UserSetting
+        }
+      ]
     },
     {
       path: '/detail/:bid',
