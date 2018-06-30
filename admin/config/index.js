@@ -24,7 +24,8 @@ module.exports = {
       },
 
       '/server': {    //将www.exaple.com印射为/apis
-        target: 'http://193.112.160.232:8010',  // 接口域名
+        target: 'http://172.18.158.55',
+        //target: 'http://193.112.160.232:8010',  // 接口域名
         changeOrigin: true,  //是否跨域
         pathRewrite: {
             '^/server': ''   //需要rewrite的,

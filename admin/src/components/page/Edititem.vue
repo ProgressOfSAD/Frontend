@@ -56,10 +56,22 @@
     </div>
 
     <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-        <el-form ref="form" :model="form" label-width="50px">
+        <el-form ref="form" :model="form" label-width="100px">
             <el-form-item label="书目名称">
                 <el-input v-model="form.name"></el-input>
             </el-form-item>
+
+            <el-form-item label="封面">
+                <el-upload
+                    action="string"
+                    class="avatar-uploader"
+                    :show-file-list="false"
+                    :http-request="setImageUrl">
+                    <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                    <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                </el-upload>
+            </el-form-item>
+
             <el-form-item label="作者">
                 <el-input v-model="form.author"></el-input>
             </el-form-item>
@@ -103,12 +115,15 @@
 export default {
     data() {
         return {
+            imageName: '',
+            imageUrl: '',
             ready: false,
             isTableShow: false,
             options: [],
             select_word: '',
             editVisible: false,
             form: {
+                cover: '',
                 name: '',
                 author: '',
                 brief: '',
@@ -168,6 +183,7 @@ export default {
             this.idx = index;
             const item = this.tableData[index];
             this.form = {
+                cover: item.cover,
                 name: item.name,
                 author: item.author,
                 brief: item.brief,
@@ -179,6 +195,8 @@ export default {
                 types: item.types
             }
             this.editVisible = true;
+            this.imageName = item.cover;
+            this.imageUrl = '/static/img/' + this.imageName;
         },
         saveEdit() {
             var typeItem = {
@@ -189,7 +207,7 @@ export default {
                 i = i + 1;
             }
             var msgItem = {
-                    'cover': '',
+                    'cover': this.imageName,
                     'name': this.form.name,
                     'author': this.form.author,
                     'brief': this.form.brief,
@@ -209,13 +227,20 @@ export default {
                 if (response.data.status == 'success') {
                     this.$message.success('修改成功！');
                     this.$set(this.tableData, this.idx, this.form);
+                    this.tableData[this.idx].cover = this.imageName;
                     this.editVisible = false;
+                    this.imageName = '';
+                    this.imageUrl = '';
                 } else {
                     this.$message.error(response.data.error_msg);
                 }
             })
         },
         getSearchItem() {
+            if (this.select_word == '') {
+                this.$message.error('搜索关键字不能为空！');
+                return;
+            }
             this.isTableShow = false;
             this.tableData = [];
             this.$axios.get('/manager_app/inventory_management/', {
@@ -280,7 +305,12 @@ export default {
                         this.$message.error(response.data.error_msg);
                     }
                 })
-            }
+        },
+        setImageUrl(param) {
+            this.imageName = param.file.name;
+            this.imageUrl = '/static/img/' + this.imageName;
+            // console.log(this.imageUrl);
+        }
     },
     activated() {
         this.getTypes();
@@ -313,5 +343,31 @@ export default {
     .handle-input {
         width: 300px;
         display: inline-block;
+    }
+
+    .avatar-uploader .el-upload {
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        width: 200px;
+        height: 200px;
+    }
+    .avatar-uploader .el-upload:hover {
+        border-color: #409EFF;
+    }
+    .avatar-uploader-icon {
+        font-size: 28px;
+        color: #8c939d;
+        width: 200px;
+        height: 200px;
+        line-height: 200px;
+        text-align: center;
+    }
+    .avatar {
+        width: 200px;
+        height: 200px;
+        display: block;
     }
 </style>
