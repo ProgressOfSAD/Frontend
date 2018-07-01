@@ -25,7 +25,7 @@
         <div id="content" style="height: 800px">
         <router-view></router-view>
         </div>
-        <Footer class="layout-footer-center">
+        <Footer class="layout-footer-center" style="margin-top: 50px">
           管理员系统:
           <a href="http://localhost:8080/#/login">登录</a><br/>
           联系我们:
@@ -75,6 +75,12 @@ export default {
         }
       })
     },
+    updateKey: function() {
+      console.log(this.$route.name)
+      if (this.$route.name !== 'Search') {
+        this.searchKey = ''
+      }
+    },
     jump: function(name) {
       switch (name) {
         case "main":
@@ -100,7 +106,10 @@ export default {
       }
       this.$router.push(name);
     }
-  }
+  },
+  watch: {
+        '$route' : 'updateKey'
+    },
 };
 </script>
 

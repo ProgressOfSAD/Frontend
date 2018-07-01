@@ -56,31 +56,6 @@ export default {
         } else if (name==='setting') {
             this.$router.push('/user/setting')
         }
-    },
-    logout() {
-        var that = this
-        axios({
-            method: 'post', 
-            url: 'api/user_app/logout/'
-        })
-            .then (function(res) {
-                if (res.data.status === 'success') {
-                    that.$Message.info('登出成功')
-                    that.$store.commit('setId', -1)
-                    that.$store.commit('setAvatar', '')
-                    that.$store.commit('setLogin', false)
-                    window.localStorage.removeItem('id')
-                    window.localStorage.removeItem('name')
-                    window.localStorage.removeItem('avatar')
-                    window.localStorage.removeItem('isLogin')
-                    that.$router.push('/')
-                } else {
-                    that.$Message.error(res.data.error_msg)
-                }
-            })
-            .catch(function(err) {
-                that.$Message.error('登出失败，请稍后重试')
-            })
     }
   },
   created () {

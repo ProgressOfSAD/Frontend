@@ -6,6 +6,7 @@
                         <img :src="book.cover" style="height: 200px">
                     </Col>
                     <Col span="12">
+                        <p class="infos" style="font-size: 20px; font-weight:bold">{{ book.bookname }}</p>
                         <p class="infos"><span style="fontWeight: bold">作者:</span>{{ book.author }}</p>
                         <p class="infos"><span style="fontWeight: bold">出版社: </span>{{ book.press }}</p>
                         <p class="infos"><span style="fontWeight: bold">出版日期: </span>{{ book.date }}</p>
@@ -139,49 +140,6 @@ export default {
                 num: 1,
                 available: 1
             }
-            // book: {
-            //     cover: "https://img3.doubanio.com/view/subject/l/public/s3563113.jpg",
-            //     score: 4.5,
-            //     myScore: 5.0,
-            //     author: '三毛',
-            //     bookname: "撒哈拉的故事",
-            //     des: `三毛作品中最膾炙人口的《撒哈拉的故事》
-            //         由12篇精采動人的散文結合而成﹐
-            //         其中＜沙漠中的飯店＞﹐
-            //         是三毛適應荒涼單調的沙漠生活後﹐
-            //         重新拾筆的第一篇文字﹐
-            //         自此之後﹐三毛便寫出一系列以沙漠為背景的故事﹐
-            //         風靡了全世界的中文讀者。`,
-            //     date: "1976",
-            //     ISBN: '9789573305545',
-            //     press: '皇冠出版社',
-            //     page: '240',
-            //     isCollected: false,
-            //     num: 10,
-            //     available: 2,
-            //     comment: [
-            //         {
-            //             title: "流浪到天明",
-            //             id: '1',
-            //             author: '清隐',
-            //             like: 102,
-            //             reply: 48,
-            //             avatar: 'https://img3.doubanio.com/icon/u1282831-50.jpg',
-            //             des: `前段时间看齐豫的专访，不例外地提到三毛。
-            //                 她说初见三毛很有些吃惊，极瘦小一个女子，觉察不出经历过那么多故事。
-            //                 三毛的确貌不惊人，连“三毛”这名字也嫌潦草——也不知是她明了自身天性取了这名字，还是这个流浪的名字注定了她一生颠沛。`
-            //         },
-            //         {
-            //             title: '三毛作品的出版顺序',
-            //             id: '2',
-            //             author: '甲',
-            //             like: 198,
-            //             reply: 55,
-            //             avatar: 'https://img3.doubanio.com/icon/u158786819-1.jpg',
-            //             des: `我想从头到尾系统地看三毛的书，所以找了三毛作品的出版顺序，供想读三毛的人参考：`
-            //         }
-            //     ]
-            // }
         }
     },
     computed: {
@@ -190,23 +148,22 @@ export default {
         }
     },
     methods: {
-        disCollect() {
-            this.$set(this.book, 'isCollected', false)
-            this.$Message.info('已经取消对该书的收藏。')
-        },
         collect() {
+            if (!this.isLogin) {
+                this.$Message.info('你尚未登录。')
+                return
+            }
             let that = this
             axios({
                 method: 'post',
                 url: '/api/user_app/collect_book/',
                 data: qs.stringify({
                     bid: that.bid,
-                    
+                    protocol: 1
                 })
             })
            .then(function(res) {
                 if (res.data.status === 'success') {
-                    that.$set(this.book, 'isCollected', true)
                     that.$Message.info('收藏成功，可以在“我的书架”上找到该书籍。')
                 } else {
                     that.$Message.error(res.data.error_msg)
@@ -244,7 +201,10 @@ export default {
         },
         confirm() {
             let that = this
-            console.log('now:', this.bid)
+            if (!this.isLogin) {
+                this.$Message.info('你尚未登录。')
+                return
+            }
             axios({
                 method: 'post',
                 url: '/api/user_app/subscribe_book/',
@@ -269,18 +229,21 @@ export default {
         },
         loadComments(bid) {
             var that = this
-            axios.get('/api/user_app/comment_section/' + bid)
+            console.log(bid)
+            axios({
+                url: '/api/user_app/comment_section/' + bid + '/',
+                method: 'get'
+            })
             .then(function(res) {
                 if (res.data.status === 'success') {
-                    var msg = qs.parse(res.data.msg)
+                    var msg = JSON.parse(res.data.msg)
                     console.log(msg)
-                    book.cover = msg.cover
                 } else {
                     vm.$Message.error(res.data.error_msg)
                 }
             })
             .catch(function(err) {
-                that.$Message.error('获取书评信息失败，请重试')
+                that.$Message.error(err)
             })
         },
         findComment() {
@@ -304,7 +267,7 @@ export default {
                 // console.log(res)
                 if (res.data.status === 'success') {
                     var msg = JSON.parse(res.data.msg)
-                    // console.log(msg)
+                    console.log(msg)
                     var info
                     // console.log('k in msg:')
                     for (var k in msg) {
@@ -315,7 +278,7 @@ export default {
                     
                     info = JSON.parse(info)
                     vm.book.bookname = info.name
-                    vm.book.cover = info.cover
+                    vm.book.cover = '../../static/img/' + info.cover
                     vm.book.score = Number(info.score)
                     vm.book.author = info.author
                     vm.book.press = info.press
@@ -330,7 +293,7 @@ export default {
                 console.log('err: ', err)
                 vm.$Message.error('error:', err)
             })
-            // vm.loadComments(vm.$route.params.bid)
+            vm.loadComments(vm.$route.params.bid)
         })
         next()
     }

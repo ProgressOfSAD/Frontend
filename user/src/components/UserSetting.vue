@@ -32,16 +32,17 @@
                                 <Input v-model="settings.email" :placeholder='settings.email' disabled></Input>
                             </FormItem>
                             <FormItem label="昵称">
-                                <Input v-model="settings.name"></Input>
+                                <Input v-model="settings.username"></Input>
                             </FormItem>
                             <FormItem label="手机">
                                 <Input v-model="settings.phone"></Input>
                             </FormItem>
                     </Col>
                     <Col span="4">
-                        <Avatar :src="settings.avatar" style="width: 170px;height: 170px;margin-top: 40px;border-radius: 50%;"/>
-                        <Upload action="/../../static/img">
-                            <Button type="ghost" icon="ios-cloud-upload-outline" style="margin:40%;">修改头像</Button>
+                        <Avatar v-if='hasA' :src="settings.avatar" style="width: 170px;height: 170px;margin-top: 40px;border-radius: 50%;"/>
+                        <Avatar v-else style="width: 170px;height: 170px;margin-top: 40px;border-radius: 50%;" />
+                        <Upload ref='upload' :format="['jpg','jpeg','png']" :max-size="2048" :before-upload="handleUpload" action="../../static/img">
+                            <Button type="ghost" icon="ios-cloud-upload-outline" style="margin:40%;" @click='changeAvatar'>修改头像</Button>
                         </Upload>
                     </Col>
                 </Row>
@@ -60,18 +61,22 @@ import qs from 'qs'
 export default {
   data: function() {
       return {
-          active: 'setting',
-          messages: [],
-          noNews: true,
+          active: 'settings',
           settings: {
-              'avatar': this.avatar,
-              'email': this.email,
-              'username': this.name,
-              'phone': this.phone
+              avatar: '',
+              phone: '',
+              username: '',
+              email: ''
           }
       }
   },
   computed: {
+    hasA() {
+        if (this.settings.avatar === '' || this.settings.avatar == '../../static/img/') {
+            return false
+        }
+        return true
+    },
     id() {
       return this.$store.state.id
     },
@@ -83,25 +88,32 @@ export default {
     }
   },
   methods: {
+    changeAvatar() {
+        // this.settings.avatar = '../../static/img' + 
+    },
+    handleUpload (file) {
+        // this.settings.avatar = '../../static/img/' + file.name
+        var str = '../../static/img/' + file.name
+        this.$set(this.settings, "avatar", str)
+        console.log(this.settings.avatar)
+        return false
+    },
     changeSettings() {
         let that = this
-        let set = this.setting
+        let set = this.settings
+        set.avatar = set.avatar.substring(17)
+        console.log(set.avatar)
         axios({
-            url: '/api/user_app/user_profile/' + that.id,
+            url: '/api/user_app/user_profile/' + that.id +'/',
             method: 'post',
             data: qs.stringify(set),
             headers: {'Content-Type':'application/x-www-form-urlencoded'}
         })
         .then(function(res) {
-          let msg = qs.parse(res.data.msg)
-          console.log(msg)
           if (res.data.status === 'success') {
-              that.setting.email = msg.email
-              that.setting.cover = msg.cover
-              that.setting.name = msg.username
-              that.setting.phone = msg.phone
+              that.$Message.info('修改成功!')
           } else {
-                    that.$Message.error(res.data.error_msg)
+                that.$Message.error(res.data.error_msg)
             }
         })
         .catch(function(err) {
@@ -138,18 +150,22 @@ export default {
   created () {
       let that = this
       console.log(this.id)
-      axios.get('/api/user_app/user_profile/' + this.id)
+      axios({
+          url: '/api/user_app/user_profile/' + this.id + '/',
+          method: 'get'
+      })
       .then(function(res) {
-          let msg = qs.parse(res.data.msg)
-          console.log(msg)
           if (res.data.status === 'success') {
-              that.setting.email = msg.email
-              that.setting.cover = msg.cover
-              that.setting.name = msg.username
-              that.setting.phone = msg.phone
+              let msg = JSON.parse(res.data.msg)
+              console.log(msg)
+              that.settings.email = msg.email
+              that.settings.avatar = '../../static/img/' + 'avatar1.jpeg'
+              that.settings.username = msg.username
+              that.settings.phone = msg.phone
+              console.log(that.settings)
           } else {
-                    that.$Message.error(res.data.error_msg)
-            }
+                that.$Message.error(res.data.error_msg)
+          }
         })
         .catch(function(err) {
             that.$Message.error('获取用户信息失败，请稍后重试')

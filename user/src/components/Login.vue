@@ -1,6 +1,6 @@
 <template>
   <div id='container'>
-      <Tabs value='登录' id='tab'>
+      <Tabs :value='active' id='tab'>
           <TabPane class="tabs login" label='登录'>
               <Form ref='loginData' :model='loginData' :rules='ruleValidate'>
                 <FormItem prop='loginUsername'>
@@ -93,7 +93,7 @@ export default {
       }
       callback()
     }
-    var signupUsernameValidate = function(rule, value, callback) {
+    var signupEmailValidate = function(rule, value, callback) {
       var reg = /^[\w\.\_]+\@[\w\.]+$/
       if (value === "") {
         callback(new Error("请输入用户名"))
@@ -122,6 +122,7 @@ export default {
       }
     }
     return {
+      active: '登录',
       loginData: {
         loginUsername: "",
         loginPw: ""
@@ -140,7 +141,10 @@ export default {
           { required: true, message: "请输入密码", trigger: "blur" }
         ],
         signupUsername: [
-          { validator: signupUsernameValidate, trigger: "blur" }
+          { required: true, message: "请输入用户名", trigger: "blur" }
+        ],
+        signupEmail: [
+          { validator: signupEmailValidate, trigger: "blur" }
         ],
         signupPassword: [
           { validator: signupPasswordValidate, trigger: "blur" }
@@ -171,12 +175,12 @@ export default {
                 that.$store.commit('setName', that.loginData.loginUsername)
                 window.localStorage.setItem('name', that.loginData.loginUsername)
                 // 对msg串处理
-                var str = JSON.parse(res.data.msg).uid
-                window.localStorage.setItem('id', str) //存储数据，value为string类型，如果要存对象，先转换
-                that.$store.commit('setId', str)
+                var str = JSON.parse(res.data.msg)
+                window.localStorage.setItem('id', str.uid) //存储数据，value为string类型，如果要存对象，先转换
+                that.$store.commit('setId', str.uid)
 
-                that.$store.commit('setAvatar', '../../static/img/avatar2.jpeg')
-                window.localStorage.setItem('avatar', '../../static/img/avatar2.jpeg')
+                that.$store.commit('setAvatar', '../../static/img/' + 'avatar1.jpeg')
+                window.localStorage.setItem('avatar', '../../static/img/' + 'avatar1.jpeg')
 
                 that.$store.commit('setLogin', true)
                 window.localStorage.setItem('isLogin', that.$store.state.isLogin)
@@ -205,7 +209,7 @@ export default {
             url: 'api/user_app/registry/',
             method: 'post',
             data: qs.stringify({
-              email: signupData.signupUsername,
+              email: signupData.signupEmail,
               username: signupData.signupUsername,
               password: signupData.signupPw
             }),
@@ -215,7 +219,7 @@ export default {
               console.log(res.data)
               if (res.status === 200)
                 if (res.data.status === 'success') {
-                this.reset()
+                that.reset()
                 that.$Message.success('验证邮件已经发送到您的邮箱，点击验证链接后成功注册。')
                 that.$router.push('/login')
               } else {
@@ -245,6 +249,9 @@ export default {
       this.signupData.signupPw = ""
       this.signupData.checkPw = ""
     }
+  },
+  created () {
+    this.active = '登录'
   }
 }
 </script>

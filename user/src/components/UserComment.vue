@@ -1,9 +1,9 @@
 <template>
   <div id='comment'>
-            <Card v-for='c in comments' :key='c.title'>
-                <a @click='getMessage()'>{{ c.title }}</a>
-            </Card>
-            <div v-if='noComments'>You do not have any comments~</div>
+      <div id="note" v-if='noComments'>你还没写过书评~</div>
+        <Card v-else v-for='c in comments' :key='c.title'>
+            <a @click='getMessage()'>{{ c.title }}</a>
+        </Card>
   </div>
 </template>
 
@@ -12,7 +12,7 @@
 export default {
   data: function() {
       return {
-          noComments: false,
+          noComments: true,
           comments: [
               {
                   title: 'Thinking in Java is a good book!',
@@ -34,6 +34,11 @@ export default {
 </script>
 
 <style scoped>
+#note {
+    font-size: 20px;
+    font-weight: bold;
+    padding: 50px 50px;
+}
 .ivu-menu {
     height: 700px;
 }
