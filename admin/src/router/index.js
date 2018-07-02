@@ -25,11 +25,6 @@ export default new Router({
                     meta: { title: '基础表格' }
                 },
                 {
-                    path: '/msg',
-                    component: resolve => require(['../components/page/Msg.vue'], resolve),
-                    meta: { title: '信息中心' }
-                },
-                {
                     // 权限页面
                     path: '/additem',
                     component: resolve => require(['../components/page/Additem.vue'], resolve),

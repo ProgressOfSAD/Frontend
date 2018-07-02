@@ -5,7 +5,7 @@
             <el-input v-model="select_word" placeholder="搜索用户名" class="handle-input mr10"></el-input>
             <el-button type="primary" icon="search" @click="getSearchRever()">搜索</el-button>
         </div>
-        <el-table :data="tableData" style="width: 100%">
+        <el-table v-if="ready" :data="tableData" style="width: 100%">
             <el-table-column type="expand">
                 <template slot-scope="props">
                     <el-form label-position="left" inline class="demo-table-expand">
@@ -52,6 +52,7 @@
 export default {
     data() {
         return {
+            ready: false,
             select_word: '',
             editVisible: false,
             tableLen: 1,
@@ -77,6 +78,7 @@ export default {
             this.idx = index;
             const item = this.tableData[index];
             this.form = {
+                id: item.id,
                 name: item.name,
                 bookname: item.bookname,
             }
@@ -92,6 +94,7 @@ export default {
                 bid: this.form.id
             }
             msgItem = JSON.stringify(msgItem);
+            console.log(msgItem);
             this.$axios.post('/manager_app/debit/', this.$qs.stringify({
                 msg: msgItem
             }))
@@ -104,21 +107,28 @@ export default {
             });
         },
         getSearchRever() {
+            this.ready = false;
             this.$axios.get('/manager_app/debit/', {
                 params: {
-                    username: select_word
+                    username: this.select_word
                 }
             })
             .then((response)=> {
                 if (response.data.status == 'success') {
                     const msgItem = JSON.parse(response.data.msg);
+                    //console.log(msgItem);
                     var i = 0;
                     for (var key in msgItem) {
-                        tableData[i].id = key;
-                        tableData[i].name = msgItem[key].username;
-                        tableData[i].bookname = msgItem[key].book;
+                        msgItem[key] = JSON.parse(msgItem[key]);
+                        this.tableData[i] = {
+                            id: msgItem[key].bid,
+                            name: msgItem[key].username,
+                            bookname: msgItem[key].book
+                        };
+                        //console.log(this.tableData[i]);
                         i = i+1;
                     }
+                    this.ready = true;
                 } else {
                     this.$message.error(response.data.error_msg);
                 }

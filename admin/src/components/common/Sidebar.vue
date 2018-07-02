@@ -36,11 +36,6 @@
                         title: '系统首页'
                     },
                     {
-                        icon: 'el-icon-message',
-                        index: 'msg',
-                        title: '信息中心'
-                    },
-                    {
                         icon: 'el-icon-document',
                         index: '4',
                         title: '库存管理',
