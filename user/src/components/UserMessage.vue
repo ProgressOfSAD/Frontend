@@ -1,33 +1,9 @@
 <template>
-  <div id='user' :style="{padding: '10px 50px 0px 50px'}">
-    <Row>
-        <Col span=4>
-            <Menu :active-name='active' ref="leftMenu" @on-select='selectFn'>
-                <MenuItem name="bookshelf">
-                <Icon type="ios-book"></Icon>
-                个人书架
-                </MenuItem>
-                <MenuItem name="message">
-                <Icon type="ios-bell"></Icon>
-                消息提醒
-                </MenuItem>
-                <MenuItem name="comment">
-                <Icon type="document-text"></Icon>
-                我的书评
-                </MenuItem>
-                <MenuItem name="setting">
-                <Icon type="gear-b"></Icon>
-                设置
-                </MenuItem>
-            </Menu>
-        </Col>
-        <Col id='userContent' span=20 style="height: 700px; background: white">
-            <Card v-for='m in messages' :key='m'>
-                <a @click='getMessage()'>{{ m.title }}</a>
-            </Card>
-            <div v-if='noNews' id='note'>You do not have any news~</div>
-        </Col>
-    </Row>
+  <div id='messages'>
+      <div v-if='noNews' id='note'>你没有新消息~</div>
+        <Card v-else v-for='m in messages' :key='m'>
+            <a @click='getMessage()'>{{ m.title }}</a>
+        </Card>
   </div>
 </template>
 
@@ -41,16 +17,43 @@ export default {
           noNews: true
       }
   },
-  methods: {
-    selectFn (a) {
-        console.log(a, this.$route.path)
-        this.$router.push({
-          path: a
-        })
-    },
-    findBook: function() {
-        this.$router.push('/detail')
-    }
+  computed: {
+      uid() {
+          return this.$store.state.id
+      }
+  },
+  created () {
+      var that = this
+      console.log(that.uid)
+    axios({
+      method: 'get',
+      url: '/api/user_app/user_profile/' + that.uid + '/'
+    })
+    .then(function(res) {
+      console.log(res.data)
+      if (res.data.status === 'success') {
+        var msg = JSON.parse(res.data.msg)
+        // console.log(msg)
+        for (var i in msg) {
+          var tmp = {}
+          tmp.bid = i
+          var items = JSON.parse(msg[i])
+          // console.log(items)
+          tmp.cover = '../../static/img/' + items.cover
+          tmp.bookname = items.name
+          tmp.score = items.score
+          tmp.author = items.author
+          tmp.date = items.publish_time
+          tmp.des = items.brief
+          that.books.push(tmp)
+        }
+      } else {
+        that.$Message.error(res.data.error_msg)
+      }
+    })
+    .catch(function(err) {
+        that.$Message.error('请求书籍信息失败。')
+    })
   }
 }
 </script>

@@ -1,33 +1,9 @@
 <template>
-  <div id='user' :style="{padding: '10px 50px 0px 50px'}">
-    <Row>
-        <Col span=4>
-            <Menu :active-name='active' ref="leftMenu" @on-select='selectFn'>
-                <MenuItem name="bookshelf">
-                <Icon type="ios-book"></Icon>
-                个人书架
-                </MenuItem>
-                <MenuItem name="message">
-                <Icon type="ios-bell"></Icon>
-                消息提醒
-                </MenuItem>
-                <MenuItem name="comment">
-                <Icon type="document-text"></Icon>
-                我的书评
-                </MenuItem>
-                <MenuItem name="setting">
-                <Icon type="gear-b"></Icon>
-                设置
-                </MenuItem>
-            </Menu>
-        </Col>
-        <Col id='userContent' span=20 style="height: 700px; background: white">
-            <Card v-for='c in comments' :key='c'>
-                <a @click='getMessage()'>{{ c.title }}</a>
-            </Card>
-            <div v-if='noComments'>You do not have any comments~</div>
-        </Col>
-    </Row>
+  <div id='comment'>
+      <div id="note" v-if='noComments'>你还没写过书评~</div>
+        <Card v-else v-for='c in comments' :key='c.title'>
+            <a @click='getMessage()'>{{ c.title }}</a>
+        </Card>
   </div>
 </template>
 
@@ -36,7 +12,7 @@
 export default {
   data: function() {
       return {
-          active: 'comment',
+          noComments: true,
           comments: [
               {
                   title: 'Thinking in Java is a good book!',
@@ -53,20 +29,16 @@ export default {
       }
   },
   methods: {
-    selectFn (a) {
-        console.log(a, this.$route.path)
-        this.$router.push({
-          path: a
-        })
-    },
-    findBook: function() {
-        this.$router.push('/detail')
-    }
   }
 }
 </script>
 
 <style scoped>
+#note {
+    font-size: 20px;
+    font-weight: bold;
+    padding: 50px 50px;
+}
 .ivu-menu {
     height: 700px;
 }

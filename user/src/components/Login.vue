@@ -1,6 +1,6 @@
 <template>
   <div id='container'>
-      <Tabs value='登录' id='tab'>
+      <Tabs :value='active' id='tab'>
           <TabPane class="tabs login" label='登录'>
               <Form ref='loginData' :model='loginData' :rules='ruleValidate'>
                 <FormItem prop='loginUsername'>
@@ -11,14 +11,17 @@
                 </FormItem>
                 <FormItem>
                     <div class="in-buttons">
-                        <Button type="primary" @click="signup">Sign up</Button>
-                        <Button type="ghost" @click="cancel">Cancel</Button>
+                        <Button type="primary" @click="login(loginData)">登录</Button>
+                        <Button type="ghost" @click="cancel">取消</Button>
                     </div>
                 </FormItem>
               </Form>
           </TabPane>
           <TabPane label='注册' class="tabs" id='signup'>
               <Form ref='signupData' :model='signupData' :rules='ruleValidate'>
+                <FormItem prop='signupEmail'>
+                  <Input placeholder="请输入注册邮箱" v-model="signupData.signupEmail"></Input>
+                </FormItem>
                 <FormItem prop='signupUsername'>
                   <Input placeholder="请输入用户名" v-model="signupData.signupUsername"></Input>
                 </FormItem>
@@ -30,8 +33,8 @@
                 </FormItem>
                 <FormItem>
                     <div class="up-buttons">
-                        <Button type="primary" @click="signup">Sign up</Button>
-                        <Button type="ghost" @click="cancel">Cancel</Button>
+                        <Button type="primary" @click="signup(signupData)">注册</Button>
+                        <Button type="ghost" @click="cancel()">取消</Button>
                     </div>
                 </FormItem>
               </Form>
@@ -42,11 +45,12 @@
 
 <style>
 #container {
+  margin-top: 30px !important;
   background-color: #eeeeee;
   position: relative;
   margin: auto;
   width: 500px;
-  height: 300px;
+  height: 350px;
 }
 #signup .ivu-form-item {
     margin-bottom: 9px;
@@ -77,8 +81,8 @@
 
 <script>
 /* eslint-disable */
-// import axios from 'axios'
-// import qs from 'qs'
+import axios from 'axios'
+import qs from 'qs'
 
 export default {
   data: function() {
@@ -89,7 +93,7 @@ export default {
       }
       callback()
     }
-    var signupUsernameValidate = function(rule, value, callback) {
+    var signupEmailValidate = function(rule, value, callback) {
       var reg = /^[\w\.\_]+\@[\w\.]+$/
       if (value === "") {
         callback(new Error("请输入用户名"))
@@ -100,8 +104,11 @@ export default {
       }
     }
     var signupPasswordValidate = (rule, value, callback) => {
+      var reg = /^[\w]{6,12}$/
       if (value === "") {
         callback(new Error("请输入密码"))
+      } else if (!reg.test(value)) {
+        callback(new Error("密码要求是6到12位的数字和字母或下划线"))
       }
       callback()
     }
@@ -115,11 +122,13 @@ export default {
       }
     }
     return {
+      active: '登录',
       loginData: {
         loginUsername: "",
         loginPw: ""
       },
       signupData: {
+        signupEmail: '',
         signupUsername: "",
         signupPw: "",
         checkPw: ""
@@ -132,7 +141,10 @@ export default {
           { required: true, message: "请输入密码", trigger: "blur" }
         ],
         signupUsername: [
-          { validator: signupUsernameValidate, trigger: "blur" }
+          { required: true, message: "请输入用户名", trigger: "blur" }
+        ],
+        signupEmail: [
+          { validator: signupEmailValidate, trigger: "blur" }
         ],
         signupPassword: [
           { validator: signupPasswordValidate, trigger: "blur" }
@@ -143,72 +155,103 @@ export default {
     }
   },
   methods: {
-    // login: () => {
-    //   this.$refs.loginData.validate((valid) => {
-    //     if (valid) {
-    //       axios({
-    //         method: 'post',
-    //         url: '/user_app/login',
-    //         data: qs.stringify({
-    //           username: this.loginData.loginUsername,
-    //           password: this.loginData.loginPassword
-    //         }),
-    //         headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-    //       })
-    //         .then(function (res) {
-    //           if (res.data) {
-    //             that.$store.commit('setUser', that.loginData.loginUserid)
-    //             that.loginData = {}
-    //             that.signupData = {}
-    //             that.isLogin = false
-    //             that.$Message.success('登录成功')
-    //             that.$router.push('/user')
-    //           } else {
-    //             that.$Message.error('登录失败，请稍后重试')
-    //           }
-    //         })
-    //         .catch(function (err) {
-    //           console.log(err)
-    //           that.$Message.error('登录失败，请稍后重试')
-    //         })
-    //     } else {
-    //       this.$Message.error('请先完成表单')
-    //     }
-    //   })
-    // }
-    signin: function() {
+    login (loginData) {
       var that = this
       this.$refs.loginData.validate((valid) => {
         if (valid) {
-          that.$router.push('/')
+          axios({
+            method: 'post',
+            url: 'api/user_app/login/',
+            data: qs.stringify({
+              username: this.loginData.loginUsername,
+              password: this.loginData.loginPw
+            }),
+            headers: {'Content-Type':'application/x-www-form-urlencoded'}
+          })
+            .then(function (res) {
+              console.log(res.data)
+              if (res.data.status === 'success') {
+                
+                that.$store.commit('setName', that.loginData.loginUsername)
+                window.localStorage.setItem('name', that.loginData.loginUsername)
+                // 对msg串处理
+                var str = JSON.parse(res.data.msg)
+                window.localStorage.setItem('id', str.uid) //存储数据，value为string类型，如果要存对象，先转换
+                that.$store.commit('setId', str.uid)
+
+                that.$store.commit('setAvatar', '../../static/img/' + 'avatar1.jpeg')
+                window.localStorage.setItem('avatar', '../../static/img/' + 'avatar1.jpeg')
+
+                that.$store.commit('setLogin', true)
+                window.localStorage.setItem('isLogin', that.$store.state.isLogin)
+                console.log(that.$store.state)
+                that.$Message.success('登录成功')
+                that.$router.push('/')
+              } else {
+                console.log(res.data.error_msg)
+                that.$Message.error(res.data.error_msg)
+              }
+            })
+            .catch(function (err) {
+              console.log(err)
+              that.$Message.error('登录失败，请稍后重试')
+            })
         } else {
-          that.$Message.error('请先完成表单')
+          this.$Message.error('请先完成表单')
         }
       })
     },
-    signup: function () {
+    signup (signupData) {
       var that = this
       this.$refs.signupData.validate((valid) => {
         if (valid) {
-          that.$Message.success('注册成功')
-          // that.$refs.signupData.signupUsername = ""
-          // that.$refs.signupData.signupPw = ""
-          // that.$refs.signupData.checkPw = ""
-          // concole.log(that.$refs.signupData.signupUsername)
-          // this.$router.push({
-          //   path:this.$route.fullPath, // 获取当前连接，重新跳转
-          //   query:{
-          //   _time:new Date().getTime()/1000  // 时间戳，刷新当前router
-          //   }
-          // })
+          axios({
+            url: 'api/user_app/registry/',
+            method: 'post',
+            data: qs.stringify({
+              email: signupData.signupEmail,
+              username: signupData.signupUsername,
+              password: signupData.signupPw
+            }),
+            headers: {'Content-Type':'application/x-www-form-urlencoded'}
+          })
+          .then(function (res) {
+              console.log(res.data)
+              if (res.status === 200)
+                if (res.data.status === 'success') {
+                that.reset()
+                that.$Message.success('验证邮件已经发送到您的邮箱，点击验证链接后成功注册。')
+                that.$router.push('/login')
+              } else {
+                console.log(res.data.error_msg)
+                that.$Message.error(res.data.error_msg)
+              }
+            })
+            .catch(function (err) {
+              console.log(err)
+              that.$Message.error('注册失败，请稍后重试')
+            })
         } else {
-          that.$Message.error('注册失败，请稍后尝试')
+          this.$Message.error('请先完成表单')
+          this.reset()
         }
       })
     },
     cancel: function() {
       this.$router.push('/')
+    },
+    reset: function() {
+      console.log(this.loginData.loginUsername)
+      this.loginData.loginUsername = "",
+      console.log(this.loginData.loginUsername)
+      this.loginData.loginPw = ""
+      this.signupData.signupUsername = ""
+      this.signupData.signupPw = ""
+      this.signupData.checkPw = ""
     }
+  },
+  created () {
+    this.active = '登录'
   }
 }
 </script>
