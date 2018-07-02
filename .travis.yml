@@ -2,5 +2,6 @@ sudo: required
 services:
         - docker
 script:
+        - cd user/
         - docker build -t frontend .
-        - docker run -e "ENV=UNIT" -p 8080:9528 frontend
+        - docker run -e "ENV=UNIT" -p 8080:8080 frontend
