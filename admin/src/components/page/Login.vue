@@ -1,6 +1,6 @@
 <template>
     <div class="login-wrap">
-        <div class="ms-title">图书馆后台管理系统</div>
+        <div class="ms-title">云书架后台管理系统</div>
         <div class="ms-login">
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="0px" class="demo-ruleForm">
                 <el-form-item prop="username">
@@ -40,8 +40,24 @@
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        localStorage.setItem('ms_username',this.ruleForm.username);
-                        this.$router.push('/');
+                        // test
+                        // localStorage.setItem('ms_username',this.ruleForm.username);
+                        // this.$router.push('/');
+                        console.log(typeof(this.ruleForm.username));
+                        console.log(typeof(this.ruleForm.password));
+                        this.$axios.post('/manager_app/login/', this.$qs.stringify({
+                            'username': this.ruleForm.username,
+                            'password': this.ruleForm.password
+                        }))
+                        .then((response)=>{
+                            if (response.data.status == 'success') {
+                                localStorage.setItem('ms_username',this.ruleForm.username);
+                                this.$router.push('/');
+                            } else {
+                                console.log(response); 
+                                this.$message.error(response.data.error_msg);
+                            }
+                        });
                     } else {
                         console.log('error submit!!');
                         return false;

@@ -4,7 +4,7 @@
         <div class="collapse-btn" @click="collapseChage">
             <i class="el-icon-menu"></i>
         </div>
-        <div class="logo">后台管理系统</div>
+        <div class="logo">云书架后台管理系统</div>
         <div class="header-right">
             <div class="header-user-con">
                 <!-- 全屏显示 -->
@@ -13,24 +13,15 @@
                         <i class="el-icon-rank"></i>
                     </el-tooltip>
                 </div>
-                <!-- 消息中心 -->
-                <div class="btn-bell">
-                    <el-tooltip effect="dark" :content="message?`有${message}条未读消息`:`消息中心`" placement="bottom">
-                        <router-link to="/tabs">
-                            <i class="el-icon-bell"></i>
-                        </router-link>
-                    </el-tooltip>
-                    <span class="btn-bell-badge" v-if="message"></span>
-                </div>
                 <!-- 用户头像 -->
-                <div class="user-avator"><img src="static/img/img.jpg"></div>
+                <div class="user-avator"><img src="static/img/adminAva.jpg"></div>
                 <!-- 用户名下拉菜单 -->
                 <el-dropdown class="user-name" trigger="click" @command="handleCommand">
                     <span class="el-dropdown-link">
                         {{username}} <i class="el-icon-caret-bottom"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item command="loginout">退出登录</el-dropdown-item>
+                        <el-dropdown-item command="logout">退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
             </div>
@@ -57,9 +48,21 @@
         methods:{
             // 用户名下拉菜单选择事件
             handleCommand(command) {
-                if(command == 'loginout'){
-                    localStorage.removeItem('ms_username')
+                if(command == 'logout'){
+                    // test
+                    localStorage.removeItem('ms_username');
                     this.$router.push('/login');
+
+                    this.$axios.post('/manager_app/logout/', {
+                    })
+                    .then((response)=>{
+                        if (response.data.status == 'success') {
+                            localStorage.removeItem('ms_username')
+                            this.$router.push('/login');
+                        } else {
+                            this.$message.error(response.data.error_msg);
+                        }
+                    })
                 }
             },
             // 侧边栏折叠

@@ -6,14 +6,16 @@
                     <el-col>
                         <el-card shadow="hover" class="mgb20">
                             <div class="user-info">
-                                <img src="static/img/img.jpg" class="user-avator" alt="">
+                                <img src="static/img/adminAva.jpg" class="user-avator" alt="">
                                 <div class="user-info-cont">
                                     <div class="user-info-name">{{name}}</div>
                                     <div>{{role}}</div>
                                 </div>
                             </div>
-                            <div class="user-info-list">上次登录时间：<span>2018-01-01</span></div>
-                            <div class="user-info-list">上次登录地点：<span>东莞</span></div>
+                            <div class="user-info-list">性别：   <span>{{gender}}</span></div>
+                            <div class="user-info-list">邮箱： <span>{{email}}</span></div>
+                            <div class="user-info-list">电话： <span>{{phonenum}}</span></div>
+                            <div class="user-info-list">简介： <span>{{other}}</span></div>
                         </el-card>
                     </el-col>
                 </el-row>
@@ -27,12 +29,40 @@
     export default {
         data() {
             return {
+                istest: false,
                 name: localStorage.getItem('ms_username'),
+                gender: '男',
+                email: 'admin@sad.com',
+                phonenum: '123456789',
+                other: 'Hello!'
             }
         },
         computed: {
             role() {
                 return '管理员';
+            }
+        },
+        activated() {
+            if (!this.istest) {
+                this.getUserInfo();
+            }
+        },
+        methods: {
+            getUserInfo() {
+                this.$axios.get('/manager_app/manager_info/')
+                .then((response)=>{
+                    if (response.data.status == 'success') {
+                        const infoItem = JSON.parse(response.data.msg);
+                        this.name = infoItem.username;
+                        this.gender = infoItem.gender;
+                        this.email = infoItem.email;
+                        this.phonenum = infoItem.phone;
+                        this.other = infoItem.other;
+                    } else {
+                        this.$message.error(response.data.error_msg);
+                        
+                    }
+                });
             }
         }
     }

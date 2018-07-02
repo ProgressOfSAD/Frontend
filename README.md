@@ -21,3 +21,7 @@ docker run -e  'ENV=UNIT' -p 8000:9528 lsfr
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+
+
+# Addons
+admin 管理员系统前端使用了 https://github.com/lin-xin/vue-manage-system （vue-manage-system）的部分代码

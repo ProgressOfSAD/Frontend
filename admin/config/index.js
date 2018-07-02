@@ -21,7 +21,16 @@ module.exports = {
       '/ms':{
           target: 'https://www.easy-mock.com/mock/592501a391470c0ac1fab128',
           changeOrigin: true
-      }
+      },
+
+      '/server': {    //将www.exaple.com印射为/apis
+        target: 'http://172.18.158.55',
+        //target: 'http://193.112.160.232:8010',  // 接口域名
+        changeOrigin: true,  //是否跨域
+        pathRewrite: {
+            '^/server': ''   //需要rewrite的,
+        }              
+    }
     },
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
