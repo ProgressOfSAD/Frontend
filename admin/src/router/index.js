@@ -20,11 +20,6 @@ export default new Router({
                     meta: { title: '系统首页' }
                 },
                 {
-                    path: '/table',
-                    component: resolve => require(['../components/page/BaseTable.vue'], resolve),
-                    meta: { title: '基础表格' }
-                },
-                {
                     // 权限页面
                     path: '/additem',
                     component: resolve => require(['../components/page/Additem.vue'], resolve),
@@ -75,10 +70,6 @@ export default new Router({
         {
             path: '/404',
             component: resolve => require(['../components/page/404.vue'], resolve)
-        },
-        {
-            path: '/403',
-            component: resolve => require(['../components/page/403.vue'], resolve)
         },
         {
             path: '*',
